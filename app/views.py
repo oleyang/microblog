@@ -2,7 +2,7 @@
 
 # 模板默认的目录为app/templates
 from flask import render_template
-
+# 为什么时from app import app呢，在app/下没有app.py啊，莫非是__init__.py?
 from app import app
 
 # 让/和/index都调用index函数
