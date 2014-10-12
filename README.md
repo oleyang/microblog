@@ -9,4 +9,11 @@ A python Flask Frame
 
 需要安装的软件
 1. Flask-WTF
+   这是一个表单扩展
    pip install Flask-WTF
+2. Flask-SQLAlchemy
+   这是一个数据库操作扩展，支持ORM
+   pip install  Flask-SQLAlchemy
+3. sqlalchemy-migrate
+   操作数据用
+   pip install sqlalchemy-migrate

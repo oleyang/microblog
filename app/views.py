@@ -4,8 +4,13 @@
 from flask import render_template, flash, redirect
 from app import app
 
+import inspect
+
 # 从forms.py中引入LoginForm
 from forms import LoginForm
+
+def get_current_function_name():
+    return inspect.stack()[1][3]
 
 # 让/和/index都调用index函数
 @app.route('/')
@@ -25,7 +30,11 @@ def index():
     return render_template('index.html',
                            title='Microblog Home',
                            user=user,
-                           posts=posts
+                           posts=posts,
+                           nav = {
+                               'link':'/index',
+                               'title' : 'index',   
+                               }
                            )
 
 # 只允许get和post请求
@@ -41,5 +50,9 @@ def login():
     return render_template('login.html',
                            form = form,
                            title = 'Sign In',
-                           providers=app.config['OPENID_PROVIDERS']
+                           providers=app.config['OPENID_PROVIDERS'],
+                           nav = {
+                               'link':'/login',
+                               'title' : get_current_function_name(),   
+                               }
                            )

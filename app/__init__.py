@@ -1,1 +1,1 @@
-#encoding=utf-8#! env/bin/pythonfrom flask import Flask#import os#print os.path.abspath('.')app = Flask(__name__)app.config.from_object('config')# app/views.pyfrom app import views
+#encoding=utf-8#! ./env/bin/pythonfrom flask import Flaskfrom flask_sqlalchemy import SQLAlchemyapp = Flask(__name__)app.config.from_object('config')db = SQLAlchemy(app)# app/views.pyfrom app import views, models
