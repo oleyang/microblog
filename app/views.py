@@ -1,12 +1,13 @@
 #encoding=utf-8
 
 # 模板默认的目录为app/templates
-from flask import render_template, flash, redirect
+from flask import render_template, flash, redirect,session, url_for, request, g
+from flask.ext.login import login_user, logout_user, current_user, login_required
 from app import app, db, lm, oid
 # 从forms.py中引入LoginForm
 from forms import LoginForm
 
-from models import User, ROLE_USER, ROLE_ADMIN
+from models import User
 
 import inspect
 
@@ -41,7 +42,7 @@ def index():
                            )
 
 # 登录之前都要执行这个函数
-@app.befor_request
+@app.before_request
 def befor_request():
     g.user = current_user
 
