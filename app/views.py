@@ -16,8 +16,10 @@ def get_current_function_name():
 # 让/和/index都调用index函数
 @app.route('/')
 @app.route('/index')
+@login_required
 def index():
-    user  = {'nickname':'Oleyang'}
+    user = g.user
+    #user  = {'nickname':'Oleyang'}
     posts = [
         {
             'author': {'nickname':'John'},
@@ -37,6 +39,11 @@ def index():
                                'title' : 'index',   
                                }
                            )
+
+# 登录之前都要执行这个函数
+@app.befor_request
+def befor_request():
+    g.user = current_user
 
 # 只允许get和post请求
 @app.route('/login', methods=['GET', 'POST'])
@@ -98,7 +105,12 @@ def after_login(resp):
 
     login_user(user, remember = remember_me)
     return redirect(request.args.get('next') or url_for('index'))
-    
+
+#  login out
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
     
 # 从数据库中查找用户的信息 
 @lm.user_loader
