@@ -2,12 +2,13 @@
 
 # 模板默认的目录为app/templates
 from flask import render_template, flash, redirect
-from app import app
-
-import inspect
-
+from app import app, db, lm, oid
 # 从forms.py中引入LoginForm
 from forms import LoginForm
+
+from models import User, ROLE_USER, ROLE_ADMIN
+
+import inspect
 
 def get_current_function_name():
     return inspect.stack()[1][3]
@@ -39,14 +40,25 @@ def index():
 
 # 只允许get和post请求
 @app.route('/login', methods=['GET', 'POST'])
+# 告诉Flask-OpenID，下面的函数是login的view
+@oid.loginhandler
 def login():
+    # 如果已经登录就跳转到index
+    # g在哪里？
+    if g.user is not None and g.user.is_authenticated():
+        return redirect(url_for('index'))
+        
     form = LoginForm()
     # 点击的提交按钮
     if form.validate_on_submit():
-        flash('login requested for OpenID="%s", remember_me=%s' %
-              (form.openid.data, str(form.remember_me.data))
-          )
-        return redirect('login')
+        session['remember_me'] = form.remember_me.data
+        return oid.try_login(form.openid.data, ask_for=['nickname', 'email'])
+
+        # 
+        # flash('login requested for OpenID="%s", remember_me=%s' %
+        #       (form.openid.data, str(form.remember_me.data))
+        #   )
+        # return redirect('login')
     return render_template('login.html',
                            form = form,
                            title = 'Sign In',
@@ -56,3 +68,39 @@ def login():
                                'title' : get_current_function_name(),   
                                }
                            )
+
+# 登录成功以后，主要是对session的处理
+@oid.after_login
+def after_login(resp):
+    # 没有输入email
+    if resp.email is None or resp.email == '':
+        # 输出提示内容
+        flash("Invalid Login (email is none), Please relogin")
+        return redirect(url_for('login'))
+
+    user = User.query.filter_by(email==resp.email).first()
+
+    # 新用户
+    if user is None:
+        nickname = resp.nickname
+        if nickname is None or nickname == '':
+            nickname = resp.email.split('@')[0]
+
+        user = User(nickname=nickname, email=resp.email)
+        db.session.add(user)
+        db.session.commit()
+
+    # session 处理
+    remember_me = False
+    if 'remember_me' in session:
+        remember_me = session['remember_me']
+        session.pop('remember_me', None)
+
+    login_user(user, remember = remember_me)
+    return redirect(request.args.get('next') or url_for('index'))
+    
+    
+# 从数据库中查找用户的信息 
+@lm.user_loader
+def load_user(id):
+    return User.query.get(int(id))

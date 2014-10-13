@@ -1,7 +1,9 @@
 #encoding=utf-8
 
 #!env/bin/python
+# 动态加载模块
 import imp
+
 from migrate.versioning import api
 from app import db
 from config import SQLALCHEMY_DATABASE_URI

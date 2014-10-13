@@ -17,3 +17,9 @@ A python Flask Frame
 3. sqlalchemy-migrate
    操作数据用
    pip install sqlalchemy-migrate
+4. Flask-Login
+   处理登录
+   pip install Flask-Login
+5. Flask-OpenID
+   处理认证
+   php install Flask-OpenID
