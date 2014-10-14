@@ -19,6 +19,7 @@ def get_current_function_name():
 @app.route('/index')
 @login_required
 def index():
+    # g是flask中的全局变量，在一个request生命周期中，用来存储和共享数据的变量
     user = g.user
     #user  = {'nickname':'Oleyang'}
     posts = [
@@ -44,6 +45,7 @@ def index():
 # 登录之前都要执行这个函数
 @app.before_request
 def befor_request():
+    # 把当前用户的信息存在在全局的变量g中
     g.user = current_user
 
 # 只允许get和post请求
